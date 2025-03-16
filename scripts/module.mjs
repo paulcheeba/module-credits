@@ -253,7 +253,7 @@ export class MMP {
 			if (changelog && game.user.isGM) {
 				let version = module?.version != 'This is auto replaced' ? module?.version : '0.0.0' ?? '0.0.0'
 				let hasSeen = MODULE.setting('trackedChangelogs')?.[key]?.hasSeen ?? false;
-				if (isNewerVersion(version ?? '0.0.0', MODULE.setting('trackedChangelogs')?.[key]?.version ?? '0.0.0')) {
+				if (foundry.utils.isNewerVersion(version ?? '0.0.0', MODULE.setting('trackedChangelogs')?.[key]?.version ?? '0.0.0')) {
 					MODULE.debug(`${module.title} is newer then last seen, set hasSeen to false`);
 					hasSeen = false;
 				}
@@ -1285,20 +1285,24 @@ export class MMP {
 				version: game.data.coreUpdate.version
 			})}"></i> ` : ''}v${game.version}`;
 ''
-			elem[0].querySelector(isNewerVersion(game.version, "11") ? '#game-details li.system span.system-info' : '#game-details li.system span').innerHTML = `${game.data.systemUpdate.hasUpdate ? `<i class="notification-pip update fas fa-exclamation-circle" data-action="system-update" data-tooltip="${game.i18n.format("SETUP.UpdateAvailable", {
+			// Some systems (e.g. DnD5e) move the system update to their own section
+			const systemElem = elem[0].querySelector('#game-details li.system');
+			const sysInfoElem = systemElem?.querySelector(foundry.utils.isNewerVersion(game.version, "11") ? 'span.system-info' : 'span');
+			if (sysInfoElem)
+				sysInfoElem.innerHTML = `${game.data.systemUpdate.hasUpdate ? `<i class="notification-pip update fas fa-exclamation-circle" data-action="system-update" data-tooltip="${game.i18n.format("SETUP.UpdateAvailable", {
 				type: game.i18n.localize("System"),
 				channel: game.data.system.title,
 				version: game.data.systemUpdate.version
 			})}"></i> ` : ''}v${game.system.version}`;
 			
 			if (readme || changelog || attributions || license) {
-				elem[0].querySelector('#game-details li.system').insertAdjacentHTML('afterend', '<li class="system-buttons"></li>');
+				systemElem?.insertAdjacentHTML('afterend', '<li class="system-buttons"></li>');
 				if (readme  || ((game.system.readme || "").match(APIs.github) ?? false) || ((game.system.readme || "").match(APIs.rawGithub) ?? false)) {
-					elem[0].querySelector('#game-details li.system-buttons').insertAdjacentHTML('beforeend', `<button data-action="readme" data-tooltip="${MODULE.localize('dialog.moduleManagement.tags.readme')}">
+					elem[0].querySelector('#game-details li.system-buttons')?.insertAdjacentHTML('beforeend', `<button data-action="readme" data-tooltip="${MODULE.localize('dialog.moduleManagement.tags.readme')}">
 						<i class="fa-solid fa-circle-info"></i> ${MODULE.localize('dialog.moduleManagement.tags.readme')}
 					</button>`);
 					
-					elem[0].querySelector('#game-details li.system-buttons button[data-action="readme"]').addEventListener('click', (event) => {
+					elem[0].querySelector('#game-details li.system-buttons button[data-action="readme"]')?.addEventListener('click', (event) => {
 						new PreviewDialog({
 							[game.system.id]: {
 								hasSeen: false,
@@ -1312,11 +1316,11 @@ export class MMP {
 				}
 
 				if (changelog  || ((game.system.changelog || "").match(APIs.github) ?? false) || ((game.system.changelog || "").match(APIs.rawGithub) ?? false)) {
-					elem[0].querySelector('#game-details li.system-buttons').insertAdjacentHTML('beforeend', `<button data-action="changelog" data-tooltip="${MODULE.localize('dialog.moduleManagement.tags.changelog')}">
+					elem[0].querySelector('#game-details li.system-buttons')?.insertAdjacentHTML('beforeend', `<button data-action="changelog" data-tooltip="${MODULE.localize('dialog.moduleManagement.tags.changelog')}">
 						<i class="fa-solid fa-list"></i> ${MODULE.localize('dialog.moduleManagement.tags.changelog')}
 					</button>`);
 					
-					elem[0].querySelector('#game-details li.system-buttons button[data-action="changelog"]').addEventListener('click', (event) => {
+					elem[0].querySelector('#game-details li.system-buttons button[data-action="changelog"]')?.addEventListener('click', (event) => {
 						new PreviewDialog({
 							[game.system.id]: {
 								hasSeen: false,
@@ -1330,11 +1334,11 @@ export class MMP {
 				}
 
 				if (attributions  || ((game.system.flags.attributions || "").match(APIs.github) ?? false) || ((game.system.flags.attributions || "").match(APIs.rawGithub) ?? false)) {
-					elem[0].querySelector('#game-details li.system-buttons').insertAdjacentHTML('beforeend', `<button data-action="attributions" data-tooltip="${MODULE.localize('dialog.moduleManagement.tags.attributions')}">
+					elem[0].querySelector('#game-details li.system-buttons')?.insertAdjacentHTML('beforeend', `<button data-action="attributions" data-tooltip="${MODULE.localize('dialog.moduleManagement.tags.attributions')}">
 						<i class="fa-brands fa-creative-commons-by"></i> ${MODULE.localize('dialog.moduleManagement.tags.attributions')}
 					</button>`);
 					
-					elem[0].querySelector('#game-details li.system-buttons button[data-action="attributions"]').addEventListener('click', (event) => {
+					elem[0].querySelector('#game-details li.system-buttons button[data-action="attributions"]')?.addEventListener('click', (event) => {
 						new PreviewDialog({
 							[game.system.id]: {
 								hasSeen: false,
